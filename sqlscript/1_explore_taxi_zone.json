@@ -1,0 +1,20 @@
+{
+	"name": "1_explore_taxi_zone",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synapsecoursedl1968.dfs.core.windows.net/nyc-taxi-data/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIELD_TERMINATOR = ',',\n        ROWTERMINATOR = '\\n'\n    ) AS [result]\n\n-- Examine the data types for the columns\nEXEC sp_describe_first_result_set N'SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK ''abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv'',\n        FORMAT = ''CSV'',\n        PARSER_VERSION = ''2.0'',\n        HEADER_ROW = TRUE\n    ) AS [result]'\n\n-- Find maximum records length\nSELECT\n    MAX(LEN(LocationID)) LocationID,\n    MAX(LEN(Borough)) Borough,\n    MAX(LEN(Zone)) Zone,\n    MAX(LEN(service_zone)) service_zone\nFROM\n    OPENROWSET(\n        BULK 'abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS [result]\n\n-- use WITH clause to provide explicit data types\n\nSELECT *\nFROM\n    OPENROWSET(\n        BULK 'abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID SMALLINT,\n        Borough VARCHAR(15) COLLATE Latin1_General_100_CI_AI_SC_UTF8,\n        Zone VARCHAR(50) COLLATE Latin1_General_100_CI_AI_SC_UTF8,\n        service_zone VARCHAR(15) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n    ) AS [result]\n\n\nSELECT name, collation_name FROM sys.databases;\n\n-- Set collation on database level\n\nCREATE DATABASE nyc_taxi_discovery;\nUSE nyc_taxi_discovery;\n\nALTER DATABASE nyc_taxi_discovery COLLATE Latin1_General_100_CI_AI_SC_UTF8;\n\nSELECT *\nFROM\n    OPENROWSET(\n        BULK 'abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID SMALLINT,\n        Borough VARCHAR(15),\n        Zone VARCHAR(50),\n        service_zone VARCHAR(15)\n    ) AS [result]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
