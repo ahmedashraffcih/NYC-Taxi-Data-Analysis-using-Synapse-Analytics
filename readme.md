@@ -36,7 +36,7 @@ There are a lot of flies as shown below :
 ## Architecture
 - Using Serverless SQL For Data Discovery
 - Made Data Virtualization by using External Data Sources and External Files Format For more Organization and make ETL less Complex
-- Made a Data Transformation to create USP , CETAS,and View to access Data, Remove unwanted columns, and Store pre-aggregated data <br>
+- Made a Data Transformation to create USP , CETAS, and View to access Data, Remove unwanted columns, and Store pre-aggregated data <br>
 
 ### Solution Architecture
 ![Solution Architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/solution-architecture.png)
@@ -377,7 +377,7 @@ Contributions to enhance and expand the capabilities of this project are welcome
 ## Contact
 For any inquiries or feedback, feel free to contact the project maintainer:
 
-Ahmed Ashraff - ahmedashraffcih@gmail.com <br>
-[Linkedin](https://www.linkedin.com/in/ahmedashraffcih/)
+Email - ahmedashraffcih@gmail.com <br>
+LinkedIn - [Linkedin](https://www.linkedin.com/in/ahmedashraffcih/)
 
 Feel free to customize and expand upon this README to better suit the specifics of your project.
