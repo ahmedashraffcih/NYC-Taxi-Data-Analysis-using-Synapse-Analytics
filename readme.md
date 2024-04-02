@@ -1,10 +1,14 @@
 Initialized by Azure Synapse Workspace!
 
-NYC-Taxi-Data Analysis Using Azure Synapse Analytics 
+# NYC-Taxi-Data Analysis Using Azure Synapse Analytics 
 
 ## Overview
-Built a data ingestion pipeline in Azure Data lake to Visualize Countries With Highest Corona Virus Hospital Admissions Using Azure Data Factory(ADF), Azure Data Studio, Azure Data Lake Storage Gen2, Azure SQL Database, Azure Blob Storage, Dataflow, Data Brick Transformation and Hd-insight
-build production ready pipelines and create CI/CD pipelines in Azure Devops to release ADF pipelines to higher environments (Testing/ Production)
+Implemented a real-world project using Azure Synapse Analytics, utilizing NYC Taxi Trips data for practical learning, including creating SQL scripts and Spark notebooks. 
+Demonstrated proficiency in setting up dedicated SQL pools and Spark pools, enabling Synapse Link and analytic store in Cosmos DB. 
+Ingested and transformed data using Serverless SQL Pool and Spark Pool, and loaded data into dedicated SQL Pool. 
+Presented data to Power BI from Serverless SQL Pool and Dedicated SQL Pool. 
+Executed scripts and notebooks efficiently using Synapse Pipelines and Triggers. 
+Conducted operational reporting from Cosmos DB data using Azure Synapse Analytics, and built insightful reports in Power BI tailored to the data stored in Azure Synapse Analytics.
 
 ## Data Overview 
 
@@ -30,13 +34,12 @@ There are a lot of flies as shown below :
 
 
 ## Architecture
-- ‘sing Serverless SQL For Data Discovery
+- Using Serverless SQL For Data Discovery
 - Made Data Virtualization by using External Data Sources and External Files Format For more Organization and make ETL less Complex
 - Made a Data Transformation to create USP , CETAS,and View to access Data, Remove unwanted columns, and Store pre-aggregated data <br>
 
 ### Solution Architecture
 ![Solution Architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/solution-architecture.png)
-![CI/CD](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/cicd.png)
 
 ### Dedicated SQL Pool Architecture
 ![Dedicated-SQL-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Dedicated-SQL-pool-architecture.png)
@@ -46,6 +49,7 @@ There are a lot of flies as shown below :
 
 ### Spark Server Pool Architecture
 ![Spark-server-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Spark-server-pool-architecture.png)
+
 
 ## Getting Started
 1. Clone the repository: git clone https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics.git
@@ -373,7 +377,7 @@ Contributions to enhance and expand the capabilities of this project are welcome
 ## Contact
 For any inquiries or feedback, feel free to contact the project maintainer:
 
-Ahmed Ashraff - ahmedashraffcih@gmail.com
+Ahmed Ashraff - ahmedashraffcih@gmail.com <br>
 [Linkedin](https://www.linkedin.com/in/ahmedashraffcih/)
 
 Feel free to customize and expand upon this README to better suit the specifics of your project.
