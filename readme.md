@@ -52,7 +52,10 @@ There are a lot of flies as shown below :
 
 
 ## Getting Started
-1. Clone the repository: git clone https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics.git
+1. Clone the repository: 
+    ```bash
+    git clone https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics.git
+     ```
 2. Set up Azure Synapse Analytics instance and necessary resources in your Azure subscription.
 3. Configure Azure Synapse Analytics according to your data sources and desired analysis.
 4. Visualize the analyzed data using Power BI or other preferred visualization tools.
