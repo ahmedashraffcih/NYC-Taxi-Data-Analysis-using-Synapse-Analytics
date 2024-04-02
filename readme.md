@@ -6,25 +6,6 @@ NYC-Taxi-Data Analysis Using Azure Synapse Analytics
 Built a data ingestion pipeline in Azure Data lake to Visualize Countries With Highest Corona Virus Hospital Admissions Using Azure Data Factory(ADF), Azure Data Studio, Azure Data Lake Storage Gen2, Azure SQL Database, Azure Blob Storage, Dataflow, Data Brick Transformation and Hd-insight
 build production ready pipelines and create CI/CD pipelines in Azure Devops to release ADF pipelines to higher environments (Testing/ Production)
 
-## Architecture
-1. using Serverless SQL For Data Discovery
-2. made Data Virtualization by using External Data Sources and External Files Format For more Organization and make ETL less Complex
-3. made a Data Transformation to create USP , CETAS,and View to access Data, Remove unwanted columns, and Store pre-aggregated data <br>
-
-### Solution Architecture
-![Solution Architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/solution-architecture.png)
-![CI/CD](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/cicd.png)
-
-### Dedicated SQL Pool Architecture
-![Dedicated-SQL-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Dedicated-SQL-pool-architecture.png)
-
-### Spark Server Pool Architecture
-![Spark-server-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Spark-server-pool-architecture.png)
-
-
-### SQL Server Pool Architecture
-![SQL-server-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/SQL-server-pool-architecture.png)
-
 ## Data Overview 
 
 The dataset that we are going to use for our project is the trip data from New York City Taxi Services.
@@ -37,17 +18,40 @@ There is a further classification of the For Hire Vehicles called High Volume Fo
 ### Data Flies Overview 
 There are a lot of flies as shown below : 
 
-1- Taxi Zone (CSV) <br>
-2- Calendar (CSV)  <br>
-3- Trip Type (TSV)  <br>
-4- Rate Code (JSON)  <br> 
-5- Payment Type (JSON)  <br>
-6- Vendor (CSV Quoted )  <br>
-7- Trip Data (Parquet,CSV,Delta)  <br>
+1. Taxi Zone (CSV) <br>
+2. Calendar (CSV)  <br>
+3. Trip Type (TSV)  <br>
+4. Rate Code (JSON)  <br> 
+5. Payment Type (JSON)  <br>
+6. Vendor (CSV Quoted )  <br>
+7. Trip Data (Parquet,CSV,Delta)  <br>
 
 ![image](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Data_Overview.png)
 
 
+## Architecture
+- ‘sing Serverless SQL For Data Discovery
+- Made Data Virtualization by using External Data Sources and External Files Format For more Organization and make ETL less Complex
+- Made a Data Transformation to create USP , CETAS,and View to access Data, Remove unwanted columns, and Store pre-aggregated data <br>
+
+### Solution Architecture
+![Solution Architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/solution-architecture.png)
+![CI/CD](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/cicd.png)
+
+### Dedicated SQL Pool Architecture
+![Dedicated-SQL-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Dedicated-SQL-pool-architecture.png)
+
+### SQL Server Pool Architecture
+![SQL-server-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/SQL-server-pool-architecture.png)
+
+### Spark Server Pool Architecture
+![Spark-server-pool-architecture](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/Spark-server-pool-architecture.png)
+
+## Getting Started
+1. Clone the repository: git clone https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics.git
+2. Set up Azure Synapse Analytics instance and necessary resources in your Azure subscription.
+3. Configure Azure Synapse Analytics according to your data sources and desired analysis.
+4. Visualize the analyzed data using Power BI or other preferred visualization tools.
 
 ## Project Requirements
 ### 1- Data Discovery 
@@ -354,20 +358,22 @@ GROUP BY td.year,
 [NYC Taxi Trips](https://app.powerbi.com/view?r=eyJrIjoiYzdkNWU1YzgtZGJjYi00Y2RlLTgyOTctMDA3NTRkNWM4MjRlIiwidCI6ImUwYjlhZTFlLWViMjYtNDZhOC1hZGYyLWQ3ZGJjZjIzNDBhOSJ9)
 
  
+## Contributing
+Contributions to enhance and expand the capabilities of this project are welcome! Please follow these guidelines:
 
+- Fork the repository.
+- Create a new branch for your feature or enhancement.
+- Commit your changes with descriptive messages.
+- Submit a pull request for review.
 
+## Acknowledgements
+- Special thanks to the contributors of Azure Synapse Analytics and related Azure services.
+- Credits to the providers of NYC-Taxi-Trips datasets and resources used for analysis.
 
-<p> 
-Thanks <br>
-Abdallah  Ali <br>
+## Contact
+For any inquiries or feedback, feel free to contact the project maintainer:
 
-BI Developer  <br>
+Ahmed Ashraff - ahmedashraffcih@gmail.com
+[Linkedin](https://www.linkedin.com/in/ahmedashraffcih/)
 
-Abdallah.Qoutb@gmail.com
- 
-[Linkedin](https://www.linkedin.com/in/abdallah-qoutb/)
-</p>
-
-
-
-
+Feel free to customize and expand upon this README to better suit the specifics of your project.
