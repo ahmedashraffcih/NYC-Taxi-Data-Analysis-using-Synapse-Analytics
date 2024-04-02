@@ -1,0 +1,20 @@
+{
+	"name": "14_final_discovery",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery;\n\n-- Identify the percentage of cash and credit card trips by borough\n\nWITH cte_payment_type AS\n(\n    SELECT \n        CAST(JSON_VALUE(jsonDoc,'$.payment_type') AS SMALLINT) AS payment_type,\n        CAST(JSON_VALUE(jsonDoc,'$.payment_type_desc') AS VARCHAR(15)) AS payment_type_desc\n    FROM\n        OPENROWSET(\n            BULK 'payment_type.json',\n            DATA_SOURCE = 'nyc_taxi_data_raw',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '1.0',\n            FIELDQUOTE = '0x0b',\n            FIELDTERMINATOR ='0x0b',\n            ROWTERMINATOR = '0x0a'\n        )\n        WITH \n        (\n            jsonDoc NVARCHAR(MAX)\n        ) AS [result]\n),\ncte_taxi_zone AS\n(\n    SELECT * \n    FROM \n        OPENROWSET(\n            BULK 'abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            FIRSTROW = 2\n        ) \n        WITH (\n            location_id SMALLINT,\n            borough VARCHAR(15),\n            zone VARCHAR(50),\n            service_zone VARCHAR(15)\n        ) AS [result]\n),\ncte_trip_data AS\n(\n    SELECT *\n    FROM\n        OPENROWSET(\n            BULK 'trip_data_green_parquet/**',\n            DATA_SOURCE = 'nyc_taxi_data_raw',\n            FORMAT = 'PARQUET'\n        ) AS [result]\n)\nSELECT \n    borough, \n    COUNT(1) total_trips,\n    SUM(CASE WHEN payment_type_desc = 'Cash' THEN 1 ELSE 0 END) cash_trips,\n    SUM(CASE WHEN payment_type_desc = 'Credit card' THEN 1 ELSE 0 END) card_trips,\n    CAST((SUM(CASE WHEN payment_type_desc = 'Cash' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL)) * 100 AS DECIMAL(5,2)) AS cash_trips_perc,\n    CAST((SUM(CASE WHEN payment_type_desc = 'Credit card' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL))* 100 AS DECIMAL(5,2)) AS card_trips_perc\nFROM cte_trip_data\nJOIN cte_payment_type\nON cte_trip_data.payment_type=cte_payment_type.payment_type\nJOIN cte_taxi_zone\nON cte_trip_data.PULocationId = cte_taxi_zone.location_id\nWHERE cte_trip_data.payment_type IN (1,2)\nGROUP BY borough\nORDER BY borough\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
