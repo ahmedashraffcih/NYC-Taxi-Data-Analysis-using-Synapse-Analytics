@@ -72,80 +72,78 @@ There are a lot of flies as shown below :
 <li> Apply some transforms </li>
 </ol>
 
-Path :     (SQL Scripts/discovery/) <br>
-
+```
 The Assignment : 
 Identify the percentage of cash and credit card trips by borough 
-
+```
 ~~~~sql
 
-WITH v_payment_type AS
+WITH cte_payment_type AS
 (
-    SELECT CAST(JSON_VALUE(jsonDoc, '$.payment_type') AS SMALLINT) payment_type,
-            CAST(JSON_VALUE(jsonDoc, '$.payment_type_desc') AS VARCHAR(15)) payment_type_desc
-    FROM OPENROWSET(
-        BULK 'payment_type.json',
-        DATA_SOURCE = 'nyc_taxi_data_raw',
-        FORMAT = 'CSV',
-        PARSER_VERSION = '1.0', 
-        FIELDTERMINATOR = '0x0b',
-        FIELDQUOTE = '0x0b',
-        ROWTERMINATOR = '0x0a'
-    )
-    WITH
-    (
-        jsonDoc NVARCHAR(MAX)
-    ) AS payment_type
-),
-v_taxi_zone AS
-(
-    SELECT
-        *
+    SELECT 
+        CAST(JSON_VALUE(jsonDoc,'$.payment_type') AS SMALLINT) AS payment_type,
+        CAST(JSON_VALUE(jsonDoc,'$.payment_type_desc') AS VARCHAR(15)) AS payment_type_desc
     FROM
         OPENROWSET(
-            BULK 'taxi_zone.csv',
+            BULK 'payment_type.json',
             DATA_SOURCE = 'nyc_taxi_data_raw',
             FORMAT = 'CSV',
-            PARSER_VERSION = '2.0',
-            FIRSTROW = 2,
-            FIELDTERMINATOR = ',',
-            ROWTERMINATOR = '\n'
+            PARSER_VERSION = '1.0',
+            FIELDQUOTE = '0x0b',
+            FIELDTERMINATOR ='0x0b',
+            ROWTERMINATOR = '0x0a'
+        )
+        WITH 
+        (
+            jsonDoc NVARCHAR(MAX)
+        ) AS [result]
+),
+cte_taxi_zone AS
+(
+    SELECT * 
+    FROM 
+        OPENROWSET(
+            BULK 'abfss://nyc-taxi-data@synapsecoursedl1968.dfs.core.windows.net/raw/taxi_zone.csv',
+            FORMAT = 'CSV',
+            PARSER_VERSION = '2.0',
+            FIRSTROW = 2
         ) 
         WITH (
-            location_id SMALLINT 1,
-            borough VARCHAR(15) 2,
-            zone VARCHAR(50) 3,
-            service_zone VARCHAR(15) 4
-        )AS [result]
+            location_id SMALLINT,
+            borough VARCHAR(15),
+            zone VARCHAR(50),
+            service_zone VARCHAR(15)
+        ) AS [result]
 ),
-v_trip_data AS
+cte_trip_data AS
 (
-    SELECT
-        *
+    SELECT *
     FROM
         OPENROWSET(
-            BULK 'trip_data_green_parquet/year=2021/month=01/**',
-            FORMAT = 'PARQUET',
-            DATA_SOURCE = 'nyc_taxi_data_raw'
+            BULK 'trip_data_green_parquet/**',
+            DATA_SOURCE = 'nyc_taxi_data_raw',
+            FORMAT = 'PARQUET'
         ) AS [result]
 )
 SELECT 
-       v_taxi_zone.borough, 
-       COUNT(1) AS total_trips,
-       SUM(CASE WHEN v_payment_type.payment_type_desc = 'Cash' THEN 1 ELSE 0 END) AS cash_trips,
-       SUM(CASE WHEN v_payment_type.payment_type_desc = 'Credit card' THEN 1 ELSE 0 END) AS card_trips,
-       CAST((SUM(CASE WHEN v_payment_type.payment_type_desc = 'Cash' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL)) * 100 AS DECIMAL(5, 2)) AS cash_trips_percentage,
-       CAST((SUM(CASE WHEN v_payment_type.payment_type_desc = 'Credit card' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL)) * 100 AS DECIMAL(5, 2)) AS card_trips_percentage
-  FROM v_trip_data 
-  LEFT JOIN v_payment_type ON (v_trip_data.payment_type = v_payment_type.payment_type)
-  LEFT JOIN v_taxi_zone    ON (v_trip_data.PULocationId = v_taxi_zone.location_id)
-WHERE v_payment_type.payment_type_desc IN ('Cash', 'Credit card')
-GROUP BY v_taxi_zone.borough
-ORDER BY v_taxi_zone.borough;
+    borough, 
+    COUNT(1) total_trips,
+    SUM(CASE WHEN payment_type_desc = 'Cash' THEN 1 ELSE 0 END) cash_trips,
+    SUM(CASE WHEN payment_type_desc = 'Credit card' THEN 1 ELSE 0 END) card_trips,
+    CAST((SUM(CASE WHEN payment_type_desc = 'Cash' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL)) * 100 AS DECIMAL(5,2)) AS cash_trips_perc,
+    CAST((SUM(CASE WHEN payment_type_desc = 'Credit card' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL))* 100 AS DECIMAL(5,2)) AS card_trips_perc
+FROM cte_trip_data
+JOIN cte_payment_type
+ON cte_trip_data.payment_type=cte_payment_type.payment_type
+JOIN cte_taxi_zone
+ON cte_trip_data.PULocationId = cte_taxi_zone.location_id
+WHERE cte_trip_data.payment_type IN (1,2)
+GROUP BY borough
+ORDER BY borough
 
 ~~~~
 Output : 
-![image](https://github.com/AbdallahQoutbAli/Azure-Synapse-Analytics-For-Data-Engineers--Hands-On-Project/assets/47276503/415df501-86e3-433f-82f7-bc4c8d7df843)
+![image](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/sample_data.png)
 
 
 ### 2- Data Virtualization  
@@ -188,27 +186,19 @@ IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name ='csv_file_for
 
 ![image](https://github.com/AbdallahQoutbAli/Azure-Synapse-Analytics-For-Data-Engineers--Hands-On-Project/assets/47276503/8a4316d1-784e-4826-9109-5c7da58c41fc)
 
-
-
-
 ### 3- Data Ingestion  
 
-
-
-
+```
 As Show Below, We have Partitioned Files in different Locations so we need to Compain all these files and make a view 
-we will use an External Tables and Stored Procedure then Create a view with partitioned columns.  <br>
+we will use an External Tables and Stored Procedure then Create a view with partitioned columns.
+```  
+<br>
+
 ![image](https://github.com/AbdallahQoutbAli/Azure-Synapse-Analytics-For-Data-Engineers--Hands-On-Project/assets/47276503/ced5f8eb-1df3-4f99-a9ee-28d91ba829ea)
-
-
-
 
 <br>
 
 ##### a Simple Query to create a view for trip_data_green from Multiple Files and parquet files : 
-
-
-
 
 ~~~~sql
 
@@ -257,7 +247,6 @@ SELECT TOP(100) *
 GO
 ~~~~
 
-
 ### 3- Data Transformation
 
 
@@ -270,10 +259,7 @@ GO
 
 </ol>
 
-
-
 ### Business Requirements (1) :
-
 
 Campaign to encourage credit card payments : 
 1. trips made using credit card/ cash payments
@@ -303,7 +289,6 @@ GROUP BY td.year,
        CONVERT(DATE, td.lpep_pickup_datetime),
        cal.day_name
 ~~~~
-
 
 ### Business Requirements (2) 
 <ol>
