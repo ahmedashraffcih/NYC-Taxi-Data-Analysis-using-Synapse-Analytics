@@ -1,0 +1,20 @@
+{
+	"name": "13_simple_transformations",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery;\n\n-- Number of trips made by duration in hours\nSELECT\n    (DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime)/60) from_hour,\n    (DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime)/60)+1 to_hour,\n    COUNT(1) no_of_trips\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/**',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS [result]\nGROUP BY (DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime)/60),(DATEDIFF(MINUTE,lpep_pickup_datetime,lpep_dropoff_datetime)/60)+1 \nORDER BY from_hour,to_hour",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
