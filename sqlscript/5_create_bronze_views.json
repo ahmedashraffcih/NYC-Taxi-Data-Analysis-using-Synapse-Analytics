@@ -1,0 +1,20 @@
+{
+	"name": "5_create_bronze_views",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw\nGO\n\nDROP VIEW IF EXISTS bronze.vw_rate_code\nGO\n\nCREATE VIEW bronze.vw_rate_code\nAS\nSELECT rate_code_id, rate_code\nFROM\n    OPENROWSET(\n        BULK 'raw/rate_code.json',\n        DATA_SOURCE = 'nyc_taxi_src',\n        FORMAT = 'CSV',\n        FIELDQUOTE = '0x0b',\n        FIELDTERMINATOR ='0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonDoc NVARCHAR(MAX)\n    )\n    AS rate_code\n    CROSS APPLY OPENJSON(jsonDoc)\n    WITH(\n        rate_code_id TINYINT,\n        rate_code VARCHAR(20) \n    )\nGO \n\nSELECT * FROM bronze.vw_rate_code\nGO\n\nDROP VIEW IF EXISTS bronze.vw_rate_code\nGO\n\nCREATE VIEW bronze.vw_payment_type\nAS\nSELECT \n    CAST(JSON_VALUE(jsonDoc,'$.payment_type') AS SMALLINT) payment_type,\n    CAST(JSON_VALUE(jsonDoc,'$.payment_type_desc') AS  VARCHAR(15)) payment_type_desc\nFROM\n    OPENROWSET(\n        BULK 'raw/payment_type.json',\n        DATA_SOURCE = 'nyc_taxi_src',\n        FORMAT = 'CSV',\n        FIELDQUOTE = '0x0b',\n        FIELDTERMINATOR ='0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        jsonDoc NVARCHAR(MAX)\n    )\n    AS rate_code\n    CROSS APPLY OPENJSON(jsonDoc)\n    WITH(\n        rate_code_id TINYINT,\n        rate_code VARCHAR(20) \n    )\nGO \n\nSELECT * FROM bronze.vw_rate_code\nGO\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
