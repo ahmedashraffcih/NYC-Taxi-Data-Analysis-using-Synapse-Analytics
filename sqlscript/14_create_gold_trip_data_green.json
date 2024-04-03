@@ -1,0 +1,20 @@
+{
+	"name": "14_create_gold_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw\nGO\n/*\nSELECT \n    td.year, \n    td.month,\n    tz.borough,\n    CONVERT(DATE,td.lpep_pickup_datetime) trip_date,\n    c.day_name trip_day,\n    CASE WHEN c.day_name IN ('Saturday','Sunday') THEN 'Y' ELSE 'N' END AS trip_day_weekend_ind,\n    SUM(CASE WHEN pt.description = 'Credit card' THEN 1 ELSE 0 END) AS card_trip_count,\n    SUM(CASE WHEN pt.description = 'Cash' THEN 1 ELSE 0 END) AS cash_trip_count\nFROM silver.vw_trip_data_green td\nJOIN silver.taxi_zone tz\n    ON td.pu_location_id = tz.location_id\nJOIN silver.calendar c\n    ON c.date = CONVERT(DATE,td.lpep_pickup_datetime)\nJOIN silver.payment_type pt\n    ON td.payment_type = pt.payment_type\nWHERE td.year = '2020' AND td.month = '01'\nGROUP BY td.year, td.month,tz.borough, CONVERT(DATE,td.lpep_pickup_datetime), c.day_name\n*/\nEXEC gold.usp_gold_trip_data_green '2020','01'\nEXEC gold.usp_gold_trip_data_green '2020','02'\nEXEC gold.usp_gold_trip_data_green '2020','03'\nEXEC gold.usp_gold_trip_data_green '2020','04'\nEXEC gold.usp_gold_trip_data_green '2020','05'\nEXEC gold.usp_gold_trip_data_green '2020','06'\nEXEC gold.usp_gold_trip_data_green '2020','07'\nEXEC gold.usp_gold_trip_data_green '2020','08'\nEXEC gold.usp_gold_trip_data_green '2020','09'\nEXEC gold.usp_gold_trip_data_green '2020','10'\nEXEC gold.usp_gold_trip_data_green '2020','11'\nEXEC gold.usp_gold_trip_data_green '2020','12'\nEXEC gold.usp_gold_trip_data_green '2021','01'\nEXEC gold.usp_gold_trip_data_green '2021','02'\nEXEC gold.usp_gold_trip_data_green '2021','03'\nEXEC gold.usp_gold_trip_data_green '2021','04'\nEXEC gold.usp_gold_trip_data_green '2021','05'\nEXEC gold.usp_gold_trip_data_green '2021','06'",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
