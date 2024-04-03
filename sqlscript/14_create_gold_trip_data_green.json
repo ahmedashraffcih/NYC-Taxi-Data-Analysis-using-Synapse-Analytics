@@ -1,0 +1,20 @@
+{
+	"name": "14_create_gold_trip_data_green",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/ldw"
+		},
+		"content": {
+			"query": "USE nyc_taxi_ldw\nGO\n\nSELECT TOP(100)\n    td.year, \n    td.month,\n    tz.borough,\n    CONVERT(DATE,td.lpep_pickup_datetime) trip_date\nFROM silver.vw_trip_data_green td\nJOIN silver.taxi_zone tz\nON td.PULocationID = tz.location_id\nJOIN silver.calendar c\nON c.date = CONVERT(DATE,td.lpep_pickup_datetime)\nWHERE year = '2020' AND month = '01'\n\nSELECT TOP(100) * FROM silver.taxi_zone",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
