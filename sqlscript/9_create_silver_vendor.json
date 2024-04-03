@@ -1,5 +1,5 @@
 {
-	"name": "8_create_silver_vendor",
+	"name": "9_create_silver_vendor",
 	"properties": {
 		"folder": {
 			"name": "nyc_taxi/ldw"
