@@ -19,7 +19,7 @@ The next one is green taxis. They, on the other hand, are allowed to only pick u
 Then we have the farm vehicles which operate throughout the city.
 There is a further classification of the For Hire Vehicles called High Volume For-Hire Vehicles. <br> <br>
 
-### Data Flies Overview 
+### Data Files Overview 
 There are a lot of flies as shown below : 
 
 1. Taxi Zone (CSV) <br>
@@ -143,6 +143,7 @@ ORDER BY borough
 
 ~~~~
 Output : 
+
 ![image](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/sample_data.png)
 
 
@@ -180,23 +181,15 @@ IF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name ='csv_file_for
 
 ~~~~
 
-
-
-#### Full Example using External Source and External File Format 
-
-![image](https://github.com/AbdallahQoutbAli/Azure-Synapse-Analytics-For-Data-Engineers--Hands-On-Project/assets/47276503/8a4316d1-784e-4826-9109-5c7da58c41fc)
-
 ### 3- Data Ingestion  
 
 ```
-As Show Below, We have Partitioned Files in different Locations so we need to Compain all these files and make a view 
-we will use an External Tables and Stored Procedure then Create a view with partitioned columns.
+As Show Below, we have Partitioned Files in different Locations so we need to Compain all these files and make a view 
+We will use an External Tables and Stored Procedure then Create a view with partitioned columns.
 ```  
 <br>
 
-![image](https://github.com/AbdallahQoutbAli/Azure-Synapse-Analytics-For-Data-Engineers--Hands-On-Project/assets/47276503/ced5f8eb-1df3-4f99-a9ee-28d91ba829ea)
-
-<br>
+![image](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/transform.png)
 
 ##### a Simple Query to create a view for trip_data_green from Multiple Files and parquet files : 
 
@@ -249,14 +242,12 @@ GO
 
 ### 3- Data Transformation
 
-
 <ol>
 <li> Join the key information required for reporting to create a new table. </li>
 <li> Join the key information required for Analysis to create a new table.</li>
 <li> Ability to query the ingested data using SQL</li>
 <li> Must be able to analyze the transformed data via T-SQL </li>
 <li> Transformed data must be stored in columnar format (i.e., Parquet) </li>
-
 </ol>
 
 ### Business Requirements (1) :
@@ -269,25 +260,24 @@ Campaign to encourage credit card payments :
 
 Solution : 
 ~~~~sql
-SELECT td.year,
-       td.month,
-       tz.borough,
-       CONVERT(DATE, td.lpep_pickup_datetime) AS trip_date,
-       cal.day_name AS trip_day,
-       CASE WHEN cal.day_name IN ('Saturday','Sunday') THEN 'Y' ELSE 'N' END AS trip_day_weekend_ind,
-       SUM(CASE WHEN pt.description = 'Credit card' THEN 1 ELSE 0 END) AS card_trip_count,
-       SUM(CASE WHEN pt.description = 'Cash' THEN 1 ELSE 0 END) AS cash_trip_count
-  FROM silver.vw_trip_data_green td
-  JOIN silver.taxi_zone tz ON (td.pu_location_id = tz.location_id)
-  JOIN silver.calendar cal ON (cal.date = CONVERT(DATE, td.lpep_pickup_datetime))
-  JOIN silver.payment_type pt ON (td.payment_type = pt.payment_type)
-WHERE td.year = '2020'
-  AND td.month = '01'
-GROUP BY td.year,
-       td.month,
-       tz.borough,
-       CONVERT(DATE, td.lpep_pickup_datetime),
-       cal.day_name
+SELECT
+    td.year, 
+    td.month,
+    tz.borough,
+    CONVERT(DATE,td.lpep_pickup_datetime) trip_date,
+    c.day_name trip_day,
+    CASE WHEN c.day_name IN ('Saturday','Sunday') THEN 'Y' ELSE 'N' END AS trip_day_weekend_ind,
+    SUM(CASE WHEN pt.description = 'Credit card' THEN 1 ELSE 0 END) AS card_trip_count,
+    SUM(CASE WHEN pt.description = 'Cash' THEN 1 ELSE 0 END) AS cash_trip_count
+FROM silver.vw_trip_data_green td
+JOIN silver.taxi_zone tz
+    ON td.pu_location_id = tz.location_id
+JOIN silver.calendar c
+    ON c.date = CONVERT(DATE,td.lpep_pickup_datetime)
+JOIN silver.payment_type pt
+    ON td.payment_type = pt.payment_type
+WHERE td.year = '2020' AND td.month = '01'
+GROUP BY td.year, td.month,tz.borough, CONVERT(DATE,td.lpep_pickup_datetime), c.day_name
 ~~~~
 
 ### Business Requirements (2) 
@@ -303,31 +293,32 @@ GROUP BY td.year,
 
 Solution : 
 ~~~~sql
-SELECT td.year,
-       td.month,
-       tz.borough,
-       CONVERT(DATE, td.lpep_pickup_datetime) AS trip_date,
-       cal.day_name AS trip_day,
-       CASE WHEN cal.day_name IN ('Saturday','Sunday') THEN 'Y' ELSE 'N' END AS trip_day_weekend_ind,
-       SUM(CASE WHEN pt.description = 'Credit card' THEN 1 ELSE 0 END) AS card_trip_count,
-       SUM(CASE WHEN pt.description = 'Cash' THEN 1 ELSE 0 END) AS cash_trip_count,
-       SUM(CASE WHEN tt.trip_type_desc = 'Street-hail' THEN 1 ELSE 0 END) AS street_hail_trip_count,
-       SUM(CASE WHEN tt.trip_type_desc = 'Dispatch' THEN 1 ELSE 0 END) AS dispatch_trip_count ,
-       SUM(td.trip_distance) AS trip_distance,
-       SUM(DATEDIFF(MINUTE, td.lpep_pickup_datetime, td.lpep_dropoff_datetime)) AS trip_duration,
-       SUM(td.fare_amount) AS fare_amount
-  FROM silver.vw_trip_data_green td
-  JOIN silver.taxi_zone tz ON (td.pu_location_id = tz.location_id)
-  JOIN silver.calendar cal ON (cal.date = CONVERT(DATE, td.lpep_pickup_datetime))
-  JOIN silver.payment_type pt ON (td.payment_type = pt.payment_type)
-  JOIN silver.trip_type tt ON (td.trip_type = tt.trip_type)
-WHERE td.year = '2020'
-  AND td.month = '01'
-GROUP BY td.year,
-       td.month,
-       tz.borough,
-       CONVERT(DATE, td.lpep_pickup_datetime),
-       cal.day_name;
+SELECT 
+    td.year, 
+    td.month,
+    tz.borough,
+    CONVERT(DATE,td.lpep_pickup_datetime) trip_date,
+    c.day_name trip_day,
+    CASE WHEN c.day_name IN (''Saturday'',''Sunday'') THEN ''Y'' ELSE ''N'' END AS trip_day_weekend_ind,
+    SUM(CASE WHEN pt.description = ''Credit card'' THEN 1 ELSE 0 END) AS card_trip_count,
+    SUM(CASE WHEN pt.description = ''Cash'' THEN 1 ELSE 0 END) AS cash_trip_count,
+    SUM(CASE WHEN tt.trip_type_desc = ''Street-hail'' THEN 1 ELSE 0 END) AS street_hail_trip_count,
+    SUM(CASE WHEN tt.trip_type_desc = ''Dispatch'' THEN 1 ELSE 0 END) AS dispatch_trip_count,
+    SUM(td.trip_distance) trip_distance,
+    SUM(DATEDIFF(MINUTE, td.lpep_pickup_datetime, td.lpep_dropoff_datetime)) as trip_duration,
+    SUM(td.fare_amount) fare_amount
+FROM silver.vw_trip_data_green td
+JOIN silver.taxi_zone tz
+    ON td.pu_location_id = tz.location_id
+JOIN silver.calendar c
+    ON c.date = CONVERT(DATE,td.lpep_pickup_datetime)
+JOIN silver.payment_type pt
+    ON td.payment_type = pt.payment_type
+JOIN silver.trip_type tt
+ON td.trip_type = tt.trip_type
+WHERE td.year = ''' + @year + '''
+    AND td.month = ''' + @month + '''
+GROUP BY td.year, td.month, tz.borough, CONVERT(DATE, td.lpep_pickup_datetime), c.day_name'
 ~~~~
 
 ### 4- Reporting Requirements
@@ -342,12 +333,8 @@ GROUP BY td.year,
 </ol>
 
 
-  ### Sample :
-![image](https://github.com/AbdallahQoutbAli/Azure-Synapse-Analytics-For-Data-Engineers--Hands-On-Project/assets/47276503/cef39e63-83fc-462a-ae6d-0c1014de3ece)
-
-
- ### Dashboard Link : 
-[NYC Taxi Trips](https://app.powerbi.com/view?r=eyJrIjoiYzdkNWU1YzgtZGJjYi00Y2RlLTgyOTctMDA3NTRkNWM4MjRlIiwidCI6ImUwYjlhZTFlLWViMjYtNDZhOC1hZGYyLWQ3ZGJjZjIzNDBhOSJ9)
+### Sample :
+![image](https://github.com/ahmedashraffcih/NYC-Taxi-Data-Analysis-using-Synapse-Analytics/blob/main/imgs/sample.png)
 
  
 ## Contributing
@@ -366,6 +353,6 @@ Contributions to enhance and expand the capabilities of this project are welcome
 For any inquiries or feedback, feel free to contact the project maintainer:
 
 Email - ahmedashraffcih@gmail.com <br>
-LinkedIn - [Linkedin](https://www.linkedin.com/in/ahmedashraffcih/)
+LinkedIn - [ahmedashraffcih](https://www.linkedin.com/in/ahmedashraffcih/)
 
 Feel free to customize and expand upon this README to better suit the specifics of your project.
